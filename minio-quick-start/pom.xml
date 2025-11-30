@@ -24,6 +24,12 @@
             <artifactId>minio</artifactId>
         </dependency>
 
+        <!-- Gson -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+
         <!-- Log4j -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

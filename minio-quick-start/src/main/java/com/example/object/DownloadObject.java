@@ -25,7 +25,7 @@ public class DownloadObject {
                 .build();
 
         String bucketName = "bucket-1";
-        String objectName = "object-3";
+        String objectName = "object-1";
         String fileName = "/opt/data/minio.txt";
 
         // 下载
