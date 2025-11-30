@@ -1,23 +1,21 @@
 package com.example.object;
 
+import io.minio.DownloadObjectArgs;
 import io.minio.MinioClient;
-import io.minio.ObjectWriteResponse;
-import io.minio.UploadObjectArgs;
-import io.minio.errors.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.example.bean.Constant.*;
 
 /**
- * 功能：UploadObject 示例
+ * 功能：DownloadObject 示例
  * 作者：@SmartSi
  * 博客：https://smartsi.blog.csdn.net/
  * 公众号：大数据生态
  * 日期：2025/11/30 16:45
  */
-public class UploadObject {
-    private static final Logger LOG = LoggerFactory.getLogger(UploadObject.class);
+public class DownloadObject {
+    private static final Logger LOG = LoggerFactory.getLogger(DownloadObject.class);
 
     public static void main(String[] args) throws Exception {
         // MinIO 客户端
@@ -28,14 +26,15 @@ public class UploadObject {
 
         String bucketName = "bucket-1";
         String objectName = "object-3";
-        String fileName = "/opt/data/province_info.txt";
-        // 上传文件
-        UploadObjectArgs objectArgs = UploadObjectArgs.builder()
+        String fileName = "/opt/data/minio.txt";
+
+        // 下载
+        DownloadObjectArgs objectArgs = DownloadObjectArgs.builder()
                 .bucket(bucketName)
                 .object(objectName)
                 .filename(fileName)
                 .build();
-        ObjectWriteResponse response = minioClient.uploadObject(objectArgs);
-        LOG.info("{} is uploaded to {}({}) successfully", fileName, response.object(), response.bucket());
+        minioClient.downloadObject(objectArgs);
+        LOG.info("{} is successfully downloaded to {}", objectName, fileName);
     }
 }
