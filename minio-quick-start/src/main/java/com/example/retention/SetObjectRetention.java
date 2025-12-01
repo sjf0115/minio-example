@@ -29,7 +29,8 @@ public class SetObjectRetention {
                 .credentials(AK, SK)
                 .build();
 
-        String bucketName = "bucket-1";
+         String bucketName = "bucket-1";
+//        String bucketName = "bucket-object-lock";
         String objectName = "object-1";
 
         ZonedDateTime retentionUntil = ZonedDateTime.now(Time.UTC).plusDays(3).withNano(0);

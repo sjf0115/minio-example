@@ -25,7 +25,7 @@ public class GetObjectRetention {
                 .credentials(AK, SK)
                 .build();
 
-        String bucketName = "bucket-1";
+        String bucketName = "bucket-object-lock";
         String objectName = "object-1";
 
         GetObjectRetentionArgs retentionArgs = GetObjectRetentionArgs.builder().bucket(bucketName).object(objectName).build();

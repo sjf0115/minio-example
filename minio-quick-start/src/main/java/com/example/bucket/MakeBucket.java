@@ -18,7 +18,10 @@ import static com.example.bean.Constant.*;
 public class MakeBucket {
     private static final Logger LOG = LoggerFactory.getLogger(MakeBucket.class);
 
-    public static void main(String[] args) throws Exception {
+    /**
+     * 创建默认 Bucket
+     */
+    public static void markBucket () throws Exception {
         // MinIO 客户端
         MinioClient minioClient = MinioClient.builder()
                 .endpoint(ENDPOINT)
@@ -36,5 +39,33 @@ public class MakeBucket {
         } else {
             LOG.info("bucket {} is already created", bucketName);
         }
+    }
+
+    /**
+     * 启用对象锁定创建 Bucket
+     * @throws Exception
+     */
+    public static void markBucketWithObjectLock () throws Exception {
+        // MinIO 客户端
+        MinioClient minioClient = MinioClient.builder()
+                .endpoint(ENDPOINT)
+                .credentials(AK, SK)
+                .build();
+
+        String bucketName = "bucket-object-lock";
+        // 构建参数
+        BucketExistsArgs bucketExistsArgs = BucketExistsArgs.builder().bucket(bucketName).build();
+        MakeBucketArgs makeBucketArgs = MakeBucketArgs.builder().bucket(bucketName).objectLock(true).build();
+        // Bucket 不存在则创建
+        if (!minioClient.bucketExists(bucketExistsArgs)) {
+            minioClient.makeBucket(makeBucketArgs);
+            LOG.info("bucket {} is created successfully", bucketName);
+        } else {
+            LOG.info("bucket {} is already created", bucketName);
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        markBucketWithObjectLock();
     }
 }
