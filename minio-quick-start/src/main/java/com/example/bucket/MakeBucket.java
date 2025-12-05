@@ -28,7 +28,7 @@ public class MakeBucket {
                 .credentials(AK, SK)
                 .build();
 
-        String bucketName = "bucket-3";
+        String bucketName = "bucket-1";
         // 构建参数
         BucketExistsArgs bucketExistsArgs = BucketExistsArgs.builder().bucket(bucketName).build();
         MakeBucketArgs makeBucketArgs = MakeBucketArgs.builder().bucket(bucketName).build();
@@ -66,6 +66,7 @@ public class MakeBucket {
     }
 
     public static void main(String[] args) throws Exception {
-        markBucketWithObjectLock();
+        markBucket();
+        // markBucketWithObjectLock();
     }
 }

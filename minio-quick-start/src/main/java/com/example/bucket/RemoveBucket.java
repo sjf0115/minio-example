@@ -25,7 +25,7 @@ public class RemoveBucket {
                 .credentials(AK, SK)
                 .build();
 
-        String bucketName = "test-bucket";
+        String bucketName = "bucket-1";
         // 构建参数
         BucketExistsArgs bucketExistsArgs = BucketExistsArgs.builder().bucket(bucketName).build();
         RemoveBucketArgs bucketArgs = RemoveBucketArgs.builder().bucket(bucketName).build();

@@ -26,7 +26,7 @@ public class ListObjects {
                 .credentials(AK, SK)
                 .build();
 
-        String bucketName = "bucket-1";
+        String bucketName = "bucket-object-lock";
         ListObjectsArgs objectsArgs = ListObjectsArgs.builder().bucket(bucketName).recursive(true).build();
         Iterable<Result<Item>> results = minioClient.listObjects(objectsArgs);
         for (Result<Item> result : results) {
