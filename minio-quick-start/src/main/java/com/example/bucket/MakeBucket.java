@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import static com.example.bean.Constant.*;
 
 /**
- * 功能：创建 Bucket 示例
+ * 功能：MakeBucket 示例
  * 作者：@SmartSi
  * 博客：https://smartsi.blog.csdn.net/
  * 公众号：大数据生态

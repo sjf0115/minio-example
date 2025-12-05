@@ -24,7 +24,7 @@ public class BucketExists {
                 .credentials(AK, SK)
                 .build();
 
-        String bucketName = "test-bucket";
+        String bucketName = "bucket-1";
         // 构建参数
         BucketExistsArgs bucketExistsArgs = BucketExistsArgs.builder().bucket(bucketName).build();
         // 判断 Bucket 是否存

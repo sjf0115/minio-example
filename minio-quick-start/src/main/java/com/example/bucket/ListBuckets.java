@@ -10,7 +10,7 @@ import java.util.List;
 import static com.example.bean.Constant.*;
 
 /**
- * 功能：获取 Bucket 列表示例
+ * 功能：ListBuckets 示例
  * 作者：@SmartSi
  * 博客：https://smartsi.blog.csdn.net/
  * 公众号：大数据生态
