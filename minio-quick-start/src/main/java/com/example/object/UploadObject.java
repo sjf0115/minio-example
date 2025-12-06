@@ -27,7 +27,7 @@ public class UploadObject {
                 .build();
 
         String bucketName = "bucket-1";
-        String objectName = "object-3";
+        String objectName = "object-1";
         String fileName = "/opt/data/province_info.txt";
         // 上传文件
         UploadObjectArgs objectArgs = UploadObjectArgs.builder()
