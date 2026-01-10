@@ -28,7 +28,7 @@ public class GetObject {
                 .build();
 
         String bucketName = "bucket-1";
-        String objectName = "object-4";
+        String objectName = "object-2";
 
         // 从 Object 中获取输入流
         GetObjectArgs objectArgs = GetObjectArgs.builder().bucket(bucketName).object(objectName).build();
