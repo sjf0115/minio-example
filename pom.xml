@@ -9,6 +9,7 @@
 
     <modules>
         <module>minio-quick-start</module>
+        <module>spring-boot-muti-part-upload</module>
     </modules>
 
     <name>minio-example</name>

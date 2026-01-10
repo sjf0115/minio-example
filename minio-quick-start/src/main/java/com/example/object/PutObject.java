@@ -32,8 +32,8 @@ public class PutObject {
 
         // 上传数据
         StringBuilder builder = new StringBuilder();
-        for (int i = 0;i < 10; i++) {
-            builder.append(1000 + i).append("\n");
+        for (int i = 0;i < 700000; i++) {
+            builder.append(1000000000 + i).append("\n");
         }
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(builder.toString().getBytes(StandardCharsets.UTF_8));
 

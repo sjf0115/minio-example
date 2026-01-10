@@ -10,7 +10,7 @@ import io.minio.messages.Part;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -103,9 +103,12 @@ public class MinioAsyncClient extends io.minio.MinioAsyncClient {
     }
 
     @Override
-    public Multimap<String, String> newMultimap(Map<String, String> map) {
-        return super.newMultimap(map);
+    protected CompletableFuture<Integer> calculatePartCountAsync(List<ComposeSource> sources) throws InsufficientDataException, InternalException, InvalidKeyException, IOException, NoSuchAlgorithmException, XmlParserException {
+        return super.calculatePartCountAsync(sources);
     }
 
-
+    @Override
+    protected CompletableFuture<UploadPartResponse> uploadPartAsync(String bucketName, String region, String objectName, Object data, long length, String uploadId, int partNumber, Multimap<String, String> extraHeaders, Multimap<String, String> extraQueryParams) throws InsufficientDataException, InternalException, InvalidKeyException, IOException, NoSuchAlgorithmException, XmlParserException {
+        return super.uploadPartAsync(bucketName, region, objectName, data, length, uploadId, partNumber, extraHeaders, extraQueryParams);
+    }
 }

@@ -28,7 +28,7 @@ public class MakeBucket {
                 .credentials(AK, SK)
                 .build();
 
-        String bucketName = "bucket-1";
+        String bucketName = "bucket-part";
         // 构建参数
         BucketExistsArgs bucketExistsArgs = BucketExistsArgs.builder().bucket(bucketName).build();
         MakeBucketArgs makeBucketArgs = MakeBucketArgs.builder().bucket(bucketName).build();

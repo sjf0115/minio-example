@@ -26,7 +26,6 @@ public class ComposeObject {
                 .credentials(AK, SK)
                 .build();
 
-        // 单 Object 限制>=5M
         List<ComposeSource> sources = new ArrayList<ComposeSource>();
         String sourceBucketName = "bucket-1";
         String object1 = "object-1";

@@ -1,0 +1,8 @@
+server:
+  port: 8090
+
+minio:
+  endpoint: http://localhost:8000
+  access-key: EYA66D4zqFm6mWx9v15l
+  secret-key: CwmmfKe4hzZsIXdUruwInIrvCVcat4UnWqYPJT1F
+  bucket: bucket-part
