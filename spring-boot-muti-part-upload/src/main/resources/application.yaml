@@ -1,6 +1,13 @@
 server:
   port: 8090
 
+spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+
 minio:
   endpoint: http://localhost:8000
   access-key: EYA66D4zqFm6mWx9v15l

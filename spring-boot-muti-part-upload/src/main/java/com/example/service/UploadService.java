@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 功能：上传服务
@@ -97,15 +98,30 @@ public class UploadService {
      * 获取已上传的分片列表
      * @param uploadPart 请求信息
      */
-    public List<Part> listParts(UploadPart uploadPart) {
+    public ListPartsResult listParts(UploadPart uploadPart) {
         try {
-            ListPartsResponse listPartsResponse = minIOUploadClient.listParts(ListPartsArgs.builder()
+            String object = uploadPart.getObject();
+            String uploadId = uploadPart.getUploadId();
+            ListPartsResponse response = minIOUploadClient.listParts(ListPartsArgs.builder()
                     .bucket(bucket)
-                    .object(uploadPart.getObject())
-                    .uploadId(uploadPart.getUploadId()).build());
-            List<Part> partList = listPartsResponse.result().partList();
+                    .object(object)
+                    .uploadId(uploadId).build());
+            List<Part> partList = response.result().partList();
+            List<ListPart> parts = partList.stream().map(part ->
+                            ListPart.builder()
+                                    .partNumber(part.partNumber())
+                                    .etag(part.etag())
+                                    .size(part.partSize())
+                                    .build())
+                    .collect(Collectors.toList());
+            ListPartsResult result = ListPartsResult.builder()
+                    .uploadId(uploadId)
+                    .bucket(bucket)
+                    .object(object)
+                    .parts(parts)
+                    .build();
             log.info("已上传分片数量：{}", partList.size());
-            return partList;
+            return result;
         } catch (Exception e) {
             log.error("获取分片列表失败：", e);
             throw new RuntimeException("获取分片列表失败", e);
@@ -120,10 +136,13 @@ public class UploadService {
         try {
             String uploadId = uploadPart.getUploadId();
             String object = uploadPart.getObject();
-            // 查询分片
-            List<Part> partList = listParts(uploadPart);
-            Part[] parts = partList.toArray(new Part[0]);
-            // 合并分片：注，S3分片最小限制为5MB，也就是分片的大小必须大于5MB，同时小于5GB
+            // 1. 查询分片
+            ListPartsResponse listResponse = minIOUploadClient.listParts(ListPartsArgs.builder()
+                    .bucket(bucket)
+                    .object(object)
+                    .uploadId(uploadId).build());
+            Part[] parts = listResponse.result().partList().toArray(new Part[0]);
+            // 2. 合并分片：注，S3分片最小限制为5MB，也就是分片的大小必须大于5MB，同时小于5GB
             ObjectWriteResponse response = minIOUploadClient.completeMultipartUpload(CompleteMultipartUploadArgs.builder()
                     .bucket(bucket)
                     .object(object)

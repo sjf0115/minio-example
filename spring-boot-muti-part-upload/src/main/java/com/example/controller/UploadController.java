@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -30,22 +31,28 @@ public class UploadController {
     }
 
     @PostMapping(value = "/upload", consumes = "multipart/form-data")
-    public UploadPartResult uploadPart(@RequestParam UploadPart uploadPart) {
+    public UploadPartResult uploadPart(@RequestPart("file") MultipartFile file, @RequestParam String uploadId, @RequestParam String object, @RequestParam Integer partNumber) {
+        UploadPart uploadPart = UploadPart.builder()
+                .file(file)
+                .uploadId(uploadId)
+                .object(object)
+                .partNumber(partNumber)
+                .build();
         return uploadService.uploadPart(uploadPart);
     }
 
     @PostMapping(value = "/list")
-    public List<Part> listParts(@RequestParam UploadPart uploadPart) {
+    public ListPartsResult listParts(@RequestBody UploadPart uploadPart) {
         return uploadService.listParts(uploadPart);
     }
 
     @PostMapping(value = "/merge")
-    public CompleteUploadResult complete(@RequestParam UploadPart uploadPart) {
+    public CompleteUploadResult complete(@RequestBody UploadPart uploadPart) {
         return uploadService.completeMultipartUpload(uploadPart);
     }
 
     @PostMapping(value = "/abort")
-    public AbortUploadResult abort(@RequestParam UploadPart uploadPart) {
+    public AbortUploadResult abort(@RequestBody UploadPart uploadPart) {
         return uploadService.abortMultipartUpload(uploadPart);
     }
 }

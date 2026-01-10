@@ -3,6 +3,8 @@ package com.example.bean;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 功能：查询分片返回结果
  * 作者：@SmartSi
@@ -16,4 +18,5 @@ public class ListPartsResult {
     private String uploadId;
     private String bucket;
     private String object;
+    private List<ListPart> parts;
 }
