@@ -13,3 +13,6 @@ minio:
   access-key: EYA66D4zqFm6mWx9v15l
   secret-key: CwmmfKe4hzZsIXdUruwInIrvCVcat4UnWqYPJT1F
   bucket: bucket-part
+  # 每个分片100KB
+  part:
+    size: 102400

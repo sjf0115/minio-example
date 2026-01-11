@@ -26,7 +26,7 @@ public class MinIOUploadClient extends MinioAsyncClient {
     }
 
     /**
-     * 创建分片上传任务
+     * 初始化分片上传
      */
     public CreateMultipartUploadResponse createMultipartUpload(CreateMultipartUploadArgs args) {
         try {

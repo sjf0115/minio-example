@@ -8,11 +8,14 @@ import io.minio.*;
 import io.minio.messages.InitiateMultipartUploadResult;
 import io.minio.messages.Part;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.Lists;
+import org.apache.commons.io.input.BoundedInputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +39,9 @@ public class UploadService {
     @Value("${minio.bucket}")
     private String bucket;
 
+    @Value("${minio.part.size}")
+    private Long partSize;
+
     /**
      * 初始化分片上传
      * @param object 对象名称
@@ -48,13 +54,13 @@ public class UploadService {
                     .object(object)
                     .build());
             InitiateMultipartUploadResult uploadResult = response.result();
-
+            // 初始化分片上传返回结果
             CreateUploadResult result = CreateUploadResult.builder()
                     .bucket(uploadResult.bucketName())
                     .object(uploadResult.objectName())
                     .uploadId(uploadResult.uploadId())
                     .build();
-            log.info("初始化分片上传成功：{}", gson.toJson(result));
+            log.info("初始化分片上传成功，上传ID：{}", uploadResult.uploadId());
             return result;
         } catch (Exception e) {
             log.error("初始化分片上传失败：{}", e.getMessage());
@@ -69,24 +75,46 @@ public class UploadService {
      */
     public UploadPartResult uploadPart(UploadPart uploadPart) {
         try {
+            String uploadId = uploadPart.getUploadId();
             MultipartFile file = uploadPart.getFile();
-            UploadPartResponse response = minIOUploadClient.uploadPart(UploadPartArgs.builder()
-                    .bucket(bucket)
-                    .object(uploadPart.getObject())
-                    .uploadId(uploadPart.getUploadId())
-                    .partData(file.getInputStream())
-                    .partSize(file.getSize())
-                    .partNumber(uploadPart.getPartNumber())
-                    .build());
+            long fileSize = file.getSize();
+            int partNumber = uploadPart.getPartNumber();
+            String object = uploadPart.getObject();
+            List<Integer> partNumbers = Lists.newArrayList();
+            List<String> etags = Lists.newArrayList();
+            for (long start = 0; start < fileSize; start += partSize) {
+                long curPartSize = Math.min(partSize, fileSize - start);
+                // 读取文件分片并上传
+                try (InputStream is = file.getInputStream()) {
+                    is.skip(start);
+                    BoundedInputStream boundedInputStream = new BoundedInputStream(is, curPartSize);
+                    // 上传分片
+                    UploadPartResponse response = minIOUploadClient.uploadPart(UploadPartArgs.builder()
+                            .bucket(bucket)
+                            .object(object)
+                            .uploadId(uploadId)
+                            .partData(boundedInputStream)
+                            .partSize(curPartSize)
+                            .partNumber(partNumber)
+                            .build());
+                    partNumbers.add(partNumber);
+                    etags.add(response.etag());
+                    log.info("文件 {} 上传分片 {} 成功, ETag: {}", file.getName(), partNumber, response.etag());
+                } catch (RuntimeException e) {
+                    log.error("上传分片 {} 失败：", partNumber, e);
+                    throw new RuntimeException("上传分片失败", e);
+                }
+                partNumber+=1;
+            }
 
+            // 上传分片返回结果
             UploadPartResult result = UploadPartResult.builder()
-                    .uploadId(response.uploadId())
+                    .uploadId(uploadId)
                     .bucket(bucket)
-                    .object(uploadPart.getObject())
-                    .partNumber(response.partNumber())
-                    .etag(response.etag())
+                    .object(object)
+                    .partNumbers(partNumbers)
+                    .etags(etags)
                     .build();
-            log.info("上传分片成功：{}", uploadPart.getFile().getName());
             return result;
         } catch (Exception e) {
             log.error("上传分片失败：", e);
@@ -95,13 +123,14 @@ public class UploadService {
     }
 
     /**
-     * 获取已上传的分片列表
+     * 列举上传ID所属的所有已经上传成功的分片
      * @param uploadPart 请求信息
      */
     public ListPartsResult listParts(UploadPart uploadPart) {
         try {
             String object = uploadPart.getObject();
             String uploadId = uploadPart.getUploadId();
+            // 列举分片
             ListPartsResponse response = minIOUploadClient.listParts(ListPartsArgs.builder()
                     .bucket(bucket)
                     .object(object)
@@ -114,13 +143,14 @@ public class UploadService {
                                     .size(part.partSize())
                                     .build())
                     .collect(Collectors.toList());
+            // 列举分片返回结果
             ListPartsResult result = ListPartsResult.builder()
                     .uploadId(uploadId)
                     .bucket(bucket)
                     .object(object)
                     .parts(parts)
                     .build();
-            log.info("已上传分片数量：{}", partList.size());
+            log.info("已上传 {} 个分片：{}", parts.size(), parts.stream().map(ListPart::getPartNumber).collect(Collectors.toList()));
             return result;
         } catch (Exception e) {
             log.error("获取分片列表失败：", e);
@@ -149,7 +179,7 @@ public class UploadService {
                     .uploadId(uploadId)
                     .parts(parts)
                     .build());
-
+            // 合并分片返回结果
             CompleteUploadResult result = CompleteUploadResult.builder()
                     .uploadId(uploadId)
                     .bucket(bucket)
@@ -157,7 +187,7 @@ public class UploadService {
                     .versionId(response.versionId())
                     .etag(response.etag())
                     .build();
-            log.info("合并 {} 个分片成功：{}", parts.length, uploadId);
+            log.info("完成分片上传成功, 上传ID: {}, 分片个数: {}", uploadId, parts.length);
             return result;
         } catch (Exception e) {
             log.error("合合并分片失败：", e);
@@ -177,7 +207,7 @@ public class UploadService {
                     .bucket(bucket)
                     .object(object)
                     .uploadId(uploadId).build());
-
+            // 取消分片返回结果
             AbortUploadResult result = AbortUploadResult.builder()
                     .uploadId(uploadId)
                     .bucket(bucket)

@@ -3,6 +3,8 @@ package com.example.bean;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 功能：上传分片返回结果
  * 作者：@SmartSi
@@ -16,6 +18,6 @@ public class UploadPartResult {
     private String uploadId;
     private String bucket;
     private String object;
-    private int partNumber;
-    private String etag;
+    private List<Integer> partNumbers;
+    private List<String> etags;
 }
