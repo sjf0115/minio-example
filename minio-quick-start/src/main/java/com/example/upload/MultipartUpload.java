@@ -115,15 +115,15 @@ public class MultipartUpload {
             return response;
         } catch (Exception e) {
             LOG.error("分片上传失败 uploadId:{}，将取消上传并清理碎片", uploadId, e);
-            // 清理碎片
             try {
                 minioClient.abortMultipartUploadAsync(bucket, region, object, uploadId, null, null).get();
                 LOG.info("取消分片上传成功，已清理碎片 uploadId:{}", uploadId);
-                throw new RuntimeException("取消分片上传成功 uploadId:" + uploadId, e);
             } catch (Exception ex) {
                 LOG.error("取消分片上传失败 uploadId:{}", uploadId, ex);
                 throw new RuntimeException("取消分片上传失败, uploadId:" + uploadId, ex);
             }
+            // 清理完成后统一以原始失败原因抛出
+            throw new RuntimeException("分片上传失败，uploadId:" + uploadId, e);
         }
     }
 
